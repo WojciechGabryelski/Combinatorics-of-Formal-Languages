@@ -1,3 +1,5 @@
+# Kombinatoryka języków formalnych
+
 Autor: Wojciech Gabryelski
 
 Zaimplementowane oprogramowanie przeznaczone jest do wyznaczania dla danego wyrażenia regularnego funkcji wymiernej, której współczynniki rozwinięcia w szereg potęgowy o środku w punkcie 0 wyznaczają liczbę słów rozważanego języka o danym rozmiarze.
