@@ -1,0 +1,42 @@
+\chapter{Algorytmy}
+
+W ramach pracy dyplomowej zbudowano zestaw narzędzi, które można wykorzystać do wyznaczenia dla danego wyrażenia regularnego $r$ funkcji wymiernej, której współczynniki rozwinięcia w szereg potęgowy o środku w punkcie $0$ wyznaczają liczbę słów rozważanego języka o danym rozmiarze.
+
+Proces ten składa się z następujących etapów:
+\begin{enumerate}
+    \item przekształcenie zadanego wyrażania regularnego w skończony niedeterministyczny automat skończony z epsilon przejściami
+    \item przekształcenie automatu niedeterministycznego z epsilon przejściami w automat niedeterministyczny bez epsilon przejść
+    \item przekształcenie automatu niedeterministycznego bez epsilon przejść w deterministyczny automat skończony
+    \item minimalizacja deterministycznego automatu skończonego
+    \item wyznaczanie funkcji tworzącej z automatu skończonego
+\end{enumerate}
+
+W pierwszej kolejności wywoływana jest metoda statyczna klasy NFA
+\mint{c++}{NFA* NFA::regexToAutomaton(std::string regex);}
+która jako argument przyjmuje ciąg znaków podany przez użytkownika opisujący wyrażenie regularne, gdzie każdy znak różny od znaków (, ), + i * jest interpretowany jako symbol alfabetu, a zwraca wskaźnik na obiekt klasy \mintinline{c++}{NFA} reprezentujący stan początkowy automatu równoważnego językowi regularnemu generowanemu przez podane wyrażenie regularne (wcześniej sprawdzana jest poprawność podanego wyrażenia regularnego, a w przypadku podania błędnego wyrażenia metoda zwraca \mintinline{c++}{nullptr}). Następnie na obiekcie wskazywanym przez zwracany wskaźnik wywoływana jest metoda
+\mint{c++}{NFA* NFA::removeEpsilonTransitions();}
+która usuwa z automatu wszystkie $\varepsilon$-przejścia i zwraca wskaźnik na obiekt reprezentujący stan początkowy otrzymanego automatu. Kolejną wywoływaną funkcją jest metoda obiektu, którego wskaźnik jest zwracany przez poprzednią metodę, mianowicie jest to metoda
+\mint{c++}{DFA* NFA::toDFA();}
+która wyznacza deterministyczny automat skończony równoważny z otrzymanym wcześniej niedeterministycznym automatem skończonym i zwraca wskaźnik na obiekt klasy \mintinline{c++}{DFA} reprezentujący stan początkowy tego automatu. Zanim obliczana jest funkcja tworząca języka akceptowanego przez otrzymany automat, automat ten podlega minimalizacji za pomocą metody
+\mint{c++}{DFA* DFA::minimize()}
+W celu uzyskania funkcji tworzącej języka akceptowanego przez ten automat, na obiekcie wskazywanym przez zwrócony wskaźnik wywoływana jest metoda
+\mint{c++}{RationalFunction<Rational<integer> > DFA::getGeneratingFunction();}
+która zwraca obiekt klasy \mintinline{c++}{RationalFunction<Rational<integer> >} reprezentujący oczekiwaną funkcję tworzącą w postaci funkcji wymiernej $\frac{P(x)}{Q(x)}$, gdzie $P(x)$ i $Q(x)$ są względnie pierwszymi wielomianami o współczynnikach wymiernych (integer jest tu zdefiniowany jako typ \mintinline{c++}{mpz_class} z zewnętrznej biblioteki GMP). Metoda ta wywołuje metodę statyczną klasy \mintinline{c++}{MatrixInversion<T>}
+\mint{c++}{std::vector<std::vector<T> > MatrixInversion<T>::gaussianElimination(std::vector<std::vector<T> > a);}
+dla typu T będącego klasą \mintinline{c++}{RationalFunction<Rational<integer> >}. Jest to funkcja wyznaczająca macierz odwrotną do macierzy podanej jako argument. Obliczenia wykonywane podczas wyznaczania tej macierzy obejmują dodawanie, odejmowanie, mnożenie i dzielenie funkcji wymiernych zapisanych jako obiekty klasy \mintinline{c++}{RationalFunction<Rational<integer> >}, które z kolei wymagają obliczeń na wielomianach reprezentowanych przez obiekty klasy \mintinline{c++}{Polynomial<Rational<integer> >}. Współczynnikami tych wielomianów są liczby wymierne, z którymi związana jest klasa \mintinline{c++}{Rational<integer>}. Oprócz prostych operacji elementarnych wykonywanych na wielomianach i liczbach wymiernych, program wykorzystuje metody statyczne
+\begin{minted}{c++}
+T Operators<T>::gcd(T a, T b);
+Polynomial<T> Polynomial<T>::gcd(Polynomial<T> a, Polynomial<T> b);
+\end{minted}
+do obliczania największego wspólnego dzielnika liczb całkowitych i wielomianów w celu znalezienia postaci nieskracalnej funkcji wymiernej. Otrzymana funkcja tworząca jest na koniec przekształcana do postaci $R(x)+\frac{\hat{P}(x)}{\hat{Q}(x)}$, gdzie $R(x)$ jest wielomianem, a $\hat{P}(x)$ i $\hat{Q}(x)$ są wielomianami takimi, że stopień wielomianu $\hat{P}(x)$ jest mniejszy od stopnia wielomianu $\hat{Q}(x)$, a wielomian $\hat{Q}(x)$ jest przedstawiony w postaci iloczynu pewnych potęg wielomianów, które nie posiadają pierwiastków wymiernych lub mają dokładnie jeden pierwiastek, który jest wymierny. W tym celu tworzony jest obiekt klasy \mintinline{c++}{ExtendedRationalFunction<integer>}, którego konstruktor przyjmuje jako argument obiekt klasy \mintinline{c++}{RationalFunction<Rational<integer> >} i używa metody wyznaczającej wymierne pierwiastki wielomianu $Q(x)$, wykorzystującej twierdzenie o wymiernych pierwiastkach wielomianu o współczynnikach całkowitych. Ostatecznie, funkcja tworząca wyznaczona dla wyrażenia regularnego $r$ jest wynikiem instrukcji
+\begin{minted}{c++}
+ExtendedRationalFunction(
+    NFA::regexToAutomaton(r)
+    ->removeEpsilonTransitions()
+    ->toDFA()
+    ->minimize()
+    ->getGeneratingFunction()
+);
+\end{minted}
+
+Szczegółowe działanie powyższych algorytmów zostało opisane w poprzednich rozdziałach. Wszystkie zrealizowane kody znajdują się w skompresowanym pliku praca\textunderscore dyplomowa.zip. Opisy modułów znajdujących się w tym pliku omówione są w Dodatku \ref{app:codes}.

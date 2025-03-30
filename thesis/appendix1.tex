@@ -1,0 +1,64 @@
+\chapter{Spis zawartości dołączonego pliku ZIP}\label{app:codes}
+
+\section{Kody źródłowe}
+
+W dołączonym pliku praca\textunderscore dyplomowa.zip zostały zamieszczone kody źródłowe programu wyznaczającego funkcję tworzącą języka regularnego generowanego przez dane wyrażenie regularne. Program został napisany w języku C++11 z wykorzystaniem biblioteki GNU Multiple Precision Arithmetic Library do operacji na dużych liczbach. Poniżej znajduje się spis plików wraz z ich opisem.
+
+\subsection{NFA.h, NFA.cpp}
+
+W plikach NFA.h i NFA.cpp znajduje się deklaracja klasy NFA wraz z definicjami jej metod. Jest to klasa niedeterministycznych automatów skończonych. Każdy obiekt reprezentuje stan automatu, jego pola przechowują informacje, czy ten stan jest akceptowalny i jakie przejścia wychodzą z tego stanu. Funkcja przejścia $\delta$ jest zrealizowana za pomocą uporządkowanych map. W każdym obiekcie związanym z jakimś stanem $q\in Q$ przechowywana jest mapa, której kluczami są symbole $a\in\Sigma$, a wartością przypisaną do klucza $a$ jest zbiór stanów $\delta(a,q)$. W tej implementacji symbolem jest wartość typu char, a znak '\textbackslash0' jest traktowany jako $\varepsilon$-przejście. Poniżej opisane są najistotniejsze metody tej klasy.
+\begin{enumerate}
+    \item \mintinline{c++}{NFA* regexToAutomaton(std::string regex)} - dla danego wyrażenia regularnego zwraca niedeterministyczny automat skończony związany z tym wyrażeniem. Metoda ta wykorzystuje wcześniej omówione algorytmy przekształcania wyrażenia regularnego w $\varepsilon$-NFA.
+    \item \mintinline{c++}{NFA* removeEpsilonTransitions()} - usuwa wszystkie $\varepsilon$-przejścia z niedeterministycznego automatu skończonego (zamienia $\varepsilon$-NFA na NFA) i zwraca ten automat.
+    \item \mintinline{c++}{DFA* toDFA()} - przekształca niedeterministyczny automat skończony w deterministyczny automat skończony.
+\end{enumerate}
+
+\subsection{DFA.h, DFA.cpp}
+
+W plikach DFA.h i DFA.cpp umieszczona jest deklaracja klasy DFA oraz definicje jej metod. Jest to klasa deterministycznych automatów skończonych. Każdy obiekt tej klasy reprezentuje stan DFA, są w nim przechowywane informacje o tym, czy ten stan jest akceptowalny oraz opisane są wszystkie przejścia, które wychodzą z tego stanu. Funkcja przejścia tego automatu jest częściowo określona, to znaczy mogą istnieć taki stan $q\in Q$ i taki symbol $a\in\Sigma$, że dla pary $(q,a)$ nie jest określony nowy stan $\delta(q,a)$. Funkcja przejścia $\delta$ jest zrealizowana za pomocą uporządkowanych map - dla każdego stanu $q$ obiekt związany z tym stanem zawiera mapę, której kluczami są symbole $a$, po których możemy przejść do jakiegoś stanu, a wartością dla klucza 
+$a$ jest ten stan, czyli $\delta(q,a)$. Poniżej przedstawione są najważniejsze metody tej klasy.
+\begin{enumerate}
+    \item \mintinline{c++}{RationalFunction<Rational<integer> > getGeneratingFunction()} - oblicza funkcję tworzącą języka regularnego związanego z deterministycznym automatem skończonym.
+    \item \mintinline{c++}{bool regexMatch(const std::string& word)} - dla danego słowa sprawdza, czy to słowo należy do języka regularnego, który jest rozpoznawany przez deterministyczny automat skończony.
+    \item \mintinline{c++}{DFA* minimize()} - minimalizuje deterministyczny automat skończony według lekko zmodyfikowanego algorytmu opisanego w rozdziale 2.
+\end{enumerate}
+
+\subsection{RationalFunction.h}
+
+W pliku RationalFunction.h znajduje się szablon klasy RationalFunction. Jest to klasa funkcji wymiernych w postaci $\frac{P(x)}{Q(x)}$, gdzie $P(x)$ i $Q(x)$ są względnie pierwszymi wielomianami nad zadanym typem oraz $Q(x)\neq 0$. Zaimplementowane zostały podstawowe operacje na funkcjach wymiernych, to jest dodawanie, odejmowanie, mnożenie i dzielenie oraz skracanie ułamka do postaci nieskracalnej.
+
+\subsection{Polynomial.h}
+
+Plik Polynomial.h zawiera szablon klasy Polynomial, która reprezentuje wielomian nad zadanym typem. W tym szablonie zaimplementowane są podstawowe operacje na wielomianach, w tym dodawanie, odejmowanie, mnożenie i dzielenie z resztą. Ponadto zaimplementowany jest algorytm wyznaczający największy wspólny dzielnik dwóch wielomianów (wielomian o największym stopniu, który dzieli oba wielomiany).
+
+\subsection{Rational.h}
+
+Plik Rational.h zawiera szablon klasy Rational, która zawiera implementację ułamków liczb. Implementacja zawiera podstawowe operacje na ułamkach, które zwracają ułamek w postaci nieskracalnej.
+
+\subsection{ExtendedRationalFunction.h}
+
+W pliku ExtendedRationalFunction.h znajduje się szablon klasy ExtendedRationalFunction zawierającej implementację funkcji wymiernych w postaci $R(x)+\frac{P(x)}{Q(x)}$, gdzie $R(x)$, $P(x)$ i $Q(x)$ są wielomianami nad ułamkami liczb całkowitych zadanego typu, stopień wielomianu $P(x)$ jest mniejszy od stopnia wielomianu $Q(x)$, a wielomian $Q(x)$ jest iloczynem wielomianów, które posiadają nie więcej niż jeden pierwiastek wymierny. W implementacji tego szablonu znajduje się funkcja znajdująca wymierne pierwiastki wielomianu $Q(x)$.
+
+\subsection{MatrixInversion.h}
+
+W pliku MatrixInversion.h znajduje się szablon klas MatrixInversion, w którym zaimplementowana jest metoda obliczająca odwrotność macierzy nieosobliwej o elementach zadanego typu, wykorzystująca metodę eliminacji Gaussa.
+
+\subsection{Operators.h}
+
+Szablon klasy Operators zawiera implementacje algorytmu Euklidesa wyznaczającego największy wspólny dzielnik dwóch liczb całkowitych oraz implementację algorytmu wyznaczającego rozkład liczby całkowitej na czynniki pierwsze.
+
+\subsection{PtrMap.h}
+
+Szablon klasy PtrMap zawiera implementację pomocniczej mapy, której wartości są wskaźnikami na obiekty danej klasy. W momencie wstawiania do mapy nowej pary klucz-wartość tworzony jest nowy obiekt danej klasy, na który wskazuje wstawiany wskaźnik.
+
+\subsection{ZeroInversionException.h}
+
+W pliku tym znajduje się klasa wyjątku, który jest zwracany, gdy następuje dzielenie przez 0.
+
+\subsection{main.cpp}
+
+Jest to plik testowy, użytkownik podaje wyrażenie regularne, a program wyznacza deterministyczny automat skończony związany z tym wyrażeniem i podaje funkcję tworzącą języka generowanego przez to wyrażenie.
+
+\subsection{Makefile}
+
+Plik do kompilacji programu (kompilacja odbywa się po wpisaniu komendy make).
