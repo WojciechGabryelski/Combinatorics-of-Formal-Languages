@@ -1,4 +1,4 @@
-# Kombinatoryka języków formalnycha
+# Kombinatoryka języków formalnych
 
 Autor: Wojciech Gabryelski
 
