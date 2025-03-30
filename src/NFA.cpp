@@ -277,14 +277,6 @@ NFA* NFA::removeEpsilonTransitions() {
             state->findEpsilonClosures();
         }
     }
-	
-	for (NFA* state : states) {
-		std::cout << state << " ";
-		for (auto q : state->transitions['\0']) {
-			std::cout << q << " ";
-		}
-		std::cout << "\n";
-	}
 
     for (NFA* q : states) {
         auto it = q->transitions.find('\0');
